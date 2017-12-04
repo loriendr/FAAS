@@ -1,0 +1,54 @@
+#AWS
+***1º ENTONO GRÁFICO UBUNTU 16.4
+#refenrencia: https://aws.amazon.com/es/premiumsupport/knowledge-center/connect-to-ubuntu-1604-windows/
+#Comandos:
+sudo apt update && sudo apt upgrade
+sudo sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+sudo /etc/init.d/ssh restart
+sudo passwd ubuntu #nota: poner la pass 2 veces
+sudo apt install xrdp xfce4 xfce4-goodies tightvncserver
+echo xfce4-session> /home/ubuntu/.xsession
+sudo cp /home/ubuntu/.xsession /etc/skel
+sudo sed -i '0,/-1/s//ask-1/' /etc/xrdp/xrdp.ini
+sudo service xrdp restart
+****nota: abrir el puerto 3389 en la instancia
+
+#2º UBUNTU 16.04 - inatalación de SIFT
+#Comandos:
+sudo apt update
+sudo apt upgrade 
+sudo reboot
+wget https://github.com/sans-dfir/sift-cli/releases/download/v1.5.1/sift-cli-linux
+wget https://github.com/sans-dfir/sift-cli/releases/download/v1.5.1/sift-cli-linux.sha256.asc
+gpg --verify sift-cli-linux.sha256.asc
+gpg --keyserver pgp.mit.edu --recv-keys 22598A94
+gpg --verify sift-cli-linux.sha256.asc
+cat sift-cli-linux.sha256.asc 
+sha256sum sift-cli-linux | grep --ignore-case f9386d660ed27c396fd6228086b17b05f630d57ed2f8060650e5a078c529e9a6
+ls -hl
+chmod 777 sift-cli-linux
+ls -hl sift-cli-linux
+./sift-cli-linux --help
+sudo ./sift-cli-linux list-upgrades
+sudo ./sift-cli-linux install v2017.41.1
+sudo shutdown -h now
+sudo sansforensics #pass:forensics
+
+#GCP
+#Creación de un snapshot de una instancia
+gcloud compute --project=nombreproyecto disks snapshot nombreinstancia --zone=europe-west1-b --snapshot-names=snapshot-1
+
+#Creación de una imagen de un disco duro
+gcloud compute --project=nombreproyecto images create image-cybercamp2017 --description=analizar --source-disk=nombreinstancia --source-disk-zone=europe-west1-b
+
+#Trabajar con las , crear una imagen y comprimirla para luego enviarla
+sudo dd if=/dev/sda2 of=/tmp/disk.raw bs=4M conv=sparse
+$ cd /tmp
+$ sudo tar -Sczf /tmp/disk.tar.gz disk.raw
+
+#Copia de un fichero de una instancia a mi máquina local
+gcloud compute scp nombreinstancia:/tmp/disk.raw D:\evidencias\ --zone europe-west1-b
+
+#Hashes de evidencias en el Stotage de Google.
+gsutil hash -h gs://4ensic/evidences/disk.raw
+gsutil ls -L gs://4ensic/evidences/disk.raw
